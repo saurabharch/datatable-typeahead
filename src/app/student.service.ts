@@ -26,4 +26,9 @@ export class StudentService {
         ref.where(customfilters.field, customfilters.criteria, customfilters.filtervalue)).valueChanges());
     })
   }
+
+  typeAhead(startvalue, endvalue) {
+    return this.afs.collection('students', ref => ref.orderBy('studentName').startAt(startvalue)
+      .endAt(endvalue)).valueChanges();
+  }
 }

@@ -31,6 +31,10 @@
 </mat-form-field>
 <button mat-raised-button (click)="filterData()" color="primary">Filter now</button>
 <button mat-raised-button (click)="resetFilters()" color="primary">Reset Filters</button>
+<p>TypeAhead</p>
+<mat-form-field>
+    <input matInput placeholder="Filter by Name" [(ngModel)]="searchTerm" (keyup)="search($event)">
+</mat-form-field>
 </div>
 <div class="example-container mat-elevation-z8">
   <mat-table #table [dataSource]="dataSource" matSort>

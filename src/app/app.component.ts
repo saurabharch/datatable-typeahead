@@ -10,6 +10,7 @@ import { StudentService } from './student.service';
 
 //rxjs
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Subject } from 'rxjs/Subject';
 import { Observable } from 'rxjs/Rx';
 
 @Component({
@@ -20,6 +21,11 @@ import { Observable } from 'rxjs/Rx';
 export class AppComponent implements OnInit {
 
   @ViewChild(MatSort) sort: MatSort;
+
+  //TypeAhead  
+  startAt = new Subject();
+  endAt = new Subject();
+  searchTerm: string;
 
   studentDetails = {
     studentName: '',
@@ -42,6 +48,9 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
     this.dataSource = new StudentDataSource(this.studentDatabase, this.sort);
+    Observable.combineLatest(this.startAt, this.endAt).subscribe((value) => {
+      this.dataSource = new TypeAheadDataSource(this.student.typeAhead(value[0], value[1]));
+    })
   }
 
   addStudent() {
@@ -59,6 +68,17 @@ export class AppComponent implements OnInit {
 
   resetFilters() {
     this.dataSource = new StudentDataSource(this.studentDatabase, this.sort);
+  }
+
+  search($event) {
+    let q = $event.target.value;
+    if (q != '') {
+      this.startAt.next(q);
+      this.endAt.next(q + "\uf8ff");
+    }
+    else {
+      this.dataSource = new StudentDataSource(this.studentDatabase, this.sort);
+    }
   }
 }
 
@@ -118,6 +138,22 @@ export class StudentDataSource extends DataSource<any> {
 }
 
 export class FilteredDataSource extends DataSource<any> {
+
+  constructor(private inputobs) {
+    super()
+  }
+
+  connect(): Observable<any> {
+    return this.inputobs;
+  }
+
+  disconnect() {
+
+  }
+
+}
+
+export class TypeAheadDataSource extends DataSource<any> {
 
   constructor(private inputobs) {
     super()
